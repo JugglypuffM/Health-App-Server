@@ -55,7 +55,8 @@ class DataServiceImpl(private val authenticator: AuthenticatorInterface, private
         }
         when (result.resultCode) {
             ResultCode.OPERATION_SUCCESS -> {
-                databaseManager.updateUserInformation(request.login, UserInfo(request.data))
+                val currentInfo = databaseManager.getUserInformation(request.login).orElse(UserInfo("", 0, 0, 0))
+                databaseManager.updateUserInformation(request.login, UserInfo(request.data).copy(distance = currentInfo.distance))
                 responseObserver.onNext(Empty.getDefaultInstance())
                 responseObserver.onCompleted()
             }
