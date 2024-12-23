@@ -1,6 +1,5 @@
 package services.data
 
-import services.auth.Authenticator
 import com.google.protobuf.Empty
 import database.manager.DatabaseManager
 import domain.auth.AuthResult
@@ -18,6 +17,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import services.auth.Authenticator
 import java.util.Optional
 
 class DataServiceImplTest {
@@ -134,15 +134,18 @@ class DataServiceImplTest {
 
     @Test
     fun `updateUserData should return success when authentication is successful`() {
-        val userInfo = UserInfo("testName", 20, 80, 100)
+        val oldUserInfo = UserInfo("oldName", 21, 100, 100)
+        val newUserInfo = UserInfo("testName", 20, 80, 100000)
+        val resultUserInfo = UserInfo("testName", 20, 80, 100)
 
         val request = DataProto.UpdateDataRequest.newBuilder()
             .setLogin("testUser")
             .setPassword("testPass")
-            .setData(userInfo.toUserData())
+            .setData(newUserInfo.toUserData())
             .build()
 
-        every { databaseManagerMock.updateUserInformation("testUser", userInfo) } just Runs
+        every { databaseManagerMock.getUserInformation("testUser") } returns Optional.of(oldUserInfo)
+        every { databaseManagerMock.updateUserInformation("testUser", resultUserInfo) } just Runs
         every { authenticatorMock.login("testUser", "testPass") } returns AuthResult(
             ResultCode.OPERATION_SUCCESS,
             "success"
