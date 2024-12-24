@@ -8,8 +8,8 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 service TrainingService{
-  rpc saveTraining (SaveRequest) returns (google.protobuf.Empty);
-  rpc getTrainings(TrainingsRequest) returns (TrainingsResponse);
+  rpc saveTraining (Training) returns (google.protobuf.Empty);
+  rpc getTrainings(google.protobuf.Timestamp) returns (TrainingsResponse);
 }
 
 message Training {
@@ -28,18 +28,6 @@ message Jogging {
   google.protobuf.Timestamp date = 1;
   google.protobuf.Duration duration = 2;
   int32 distance = 3;
-}
-
-message SaveRequest {
-  string login = 1;
-  string password = 2;
-  Training training = 3;
-}
-
-message TrainingsRequest{
-  string login = 1;
-  string password = 2;
-  google.protobuf.Timestamp date = 3;
 }
 
 message TrainingsResponse{

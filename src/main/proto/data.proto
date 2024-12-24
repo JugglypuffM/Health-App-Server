@@ -6,24 +6,8 @@ option java_package = "grpc";
 option java_outer_classname = "DataProto";
 
 service DataService{
-  rpc getUserData (UserDataRequest) returns (UserDataResponse);
-  rpc updateUserData (UpdateDataRequest) returns (google.protobuf.Empty);
-}
-
-message UserDataRequest{
-  string login = 1;
-  string password = 2;
-}
-
-message UpdateDataRequest{
-  string login = 1;
-  string password = 2;
-  UserData data = 3;
-}
-
-message UserDataResponse{
-  bool success = 1;
-  UserData data = 2;
+  rpc getUserData (google.protobuf.Empty) returns (UserData);
+  rpc updateUserData (UserData) returns (google.protobuf.Empty);
 }
 
 message UserData {
