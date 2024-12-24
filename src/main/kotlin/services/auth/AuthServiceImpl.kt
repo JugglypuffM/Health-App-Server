@@ -1,41 +1,53 @@
 package services.auth
 
-import domain.auth.AuthResult
-import domain.user.Account
+import com.google.protobuf.Empty
 import domain.auth.ResultCode
-import grpc.AuthProto.AuthResponse
-import grpc.AuthProto.LoginRequest
-import grpc.AuthProto.RegisterRequest
+import domain.user.Account
+import grpc.AuthProto
 import grpc.AuthServiceGrpc
+import io.grpc.Status
 import io.grpc.stub.*
 
 class AuthServiceImpl(private val authenticator: AuthenticatorInterface) : AuthServiceGrpc.AuthServiceImplBase() {
-    private fun createAuthResponse(authResult: AuthResult): AuthResponse {
-        return AuthResponse.newBuilder()
-            .setResultCode(authResult.resultCode.code)
-            .setMessage(authResult.message)
-            .build()
-    }
-
-    override fun register(request: RegisterRequest, responseObserver: StreamObserver<AuthResponse>) {
+    override fun register(request: AuthProto.AuthRequest, responseObserver: StreamObserver<Empty>) {
         try {
             val account = Account(request.login, request.password)
             val authResult = authenticator.register(account)
 
-            responseObserver.onNext(createAuthResponse(authResult))
+            when (authResult) {
+                ResultCode.OPERATION_SUCCESS -> {
+                    responseObserver.onNext(Empty.getDefaultInstance())
+                    responseObserver.onCompleted()
+                }
+                ResultCode.USER_ALREADY_EXISTS ->
+                    responseObserver.onError(
+                        Status.ALREADY_EXISTS.withDescription("User already exists").asRuntimeException()
+                    )
+
+                else -> {}
+            }
         }
         catch (_: IllegalArgumentException) {
-            responseObserver.onNext(createAuthResponse(AuthResult(ResultCode.INVALID_CREDENTIALS, "Invalid login or password.")))
-        }
-        finally {
-            responseObserver.onCompleted()
+            responseObserver.onError(
+                Status.INVALID_ARGUMENT.withDescription("Login or password validation failed").asRuntimeException()
+            )
         }
     }
 
-    override fun login(request: LoginRequest, responseObserver: StreamObserver<AuthResponse>) {
+    override fun login(request: AuthProto.AuthRequest, responseObserver: StreamObserver<Empty>) {
         val authResult = authenticator.login(request.login, request.password)
 
-        responseObserver.onNext(createAuthResponse(authResult))
-        responseObserver.onCompleted()
+        when (authResult) {
+            ResultCode.OPERATION_SUCCESS -> {
+                responseObserver.onNext(Empty.getDefaultInstance())
+                responseObserver.onCompleted()
+            }
+
+            ResultCode.INVALID_CREDENTIALS ->
+                responseObserver.onError(
+                    Status.UNAUTHENTICATED.withDescription("Invalid user credentials").asRuntimeException()
+                )
+            else -> {}
+        }
     }
 }

@@ -4,15 +4,18 @@ import services.data.DataServiceImpl
 import database.manager.DatabaseManagerService
 import io.grpc.Server
 import io.grpc.ServerBuilder
+import services.auth.AuthInterceptor
 import services.training.TrainingServiceImpl
 
 fun main() {
     val authenticator = Authenticator(DatabaseManagerService)
+    val database = DatabaseManagerService
 
     val server: Server = ServerBuilder.forPort(50051)
         .addService(AuthServiceImpl(authenticator))
-        .addService(DataServiceImpl(authenticator, DatabaseManagerService))
-        .addService(TrainingServiceImpl(authenticator, DatabaseManagerService))
+        .addService(DataServiceImpl(database))
+        .addService(TrainingServiceImpl(database))
+        .intercept(AuthInterceptor(authenticator))
         .build()
         .start()
 
