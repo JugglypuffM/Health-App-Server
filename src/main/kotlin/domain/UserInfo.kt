@@ -6,10 +6,10 @@ import grpc.DataProto.UserData
  * Класс с информацией о пользователе
  */
 data class UserInfo(
-    val name: String,
-    val age: Int,
-    val weight: Int,
-    val distance: Int,
+    val name: String? = null,
+    val age: Int? = null,
+    val weight: Int? = null,
+    val distance: Int? = null,
 ) {
     constructor(userData: UserData) : this(
         userData.name,
@@ -19,9 +19,9 @@ data class UserInfo(
     )
 
     fun toUserData() = UserData.newBuilder()
-        .setName(name)
-        .setAge(age)
-        .setWeight(weight)
-        .setTotalDistance(distance)
+        .setName(name?:"")
+        .setAge(age?:0)
+        .setWeight(weight?:0)
+        .setTotalDistance(distance?:0)
         .build()
 }

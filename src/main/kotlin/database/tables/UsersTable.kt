@@ -6,8 +6,8 @@ import org.jetbrains.exposed.sql.Column
 object UsersTable : IntIdTable() {
     val login : Column<String> = varchar("u_login", 45).uniqueIndex()
     val password : Column<String> = varchar("u_password", 35)
-    val name : Column<String> = varchar("u_name", 20)
-    val age : Column<Int> = integer("age")
-    val weight : Column<Int> = integer("weight")
-    val distance : Column<Int> = integer("distance")
+    val name : Column<String> = varchar("u_name", 20).default("")
+    val age : Column<Int> = integer("age").default(0)
+    val weight : Column<Int> = integer("weight").default(0)
+    val distance : Column<Int> = integer("distance").default(0)
 }
