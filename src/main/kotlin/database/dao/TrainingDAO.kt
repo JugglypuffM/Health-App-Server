@@ -79,7 +79,7 @@ class TrainingDAO{
         transaction {
             try {
                 val trainingId = TrainingTable.insertAndGetId {
-                    it[loginID] = select(UsersTable.id)
+                    it[loginID] = UsersTable.select(UsersTable.id)
                         .where { UsersTable.login.eq(login)}
                         .map { it[UsersTable.id] }
                         .single()
