@@ -37,8 +37,7 @@ class DataServiceImpl(
     override fun updateUserData(request: DataProto.UserData, responseObserver: StreamObserver<Empty>) {
         val login = loginKey.get()
 
-        val currentInfo = databaseManager.getUserInformation(login).orElse(UserInfo("", 0, 0, 0))
-        databaseManager.updateUserInformation(login, UserInfo(request).copy(distance = currentInfo.distance))
+        databaseManager.updateUserInformation(login, UserInfo(request))
         responseObserver.onNext(Empty.getDefaultInstance())
         responseObserver.onCompleted()
     }
