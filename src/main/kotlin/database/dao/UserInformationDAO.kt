@@ -1,7 +1,7 @@
 package database.dao
 
 import database.exception.DatabaseException
-import database.tables.UsersTable
+import database.tables.user.UsersTable
 import domain.user.UserInfo
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -27,6 +27,7 @@ class UserInformationDAO {
                         name = entry[UsersTable.name],
                         age = entry[UsersTable.age],
                         weight = entry[UsersTable.weight],
+                        distance = entry[UsersTable.distance],
                         level = entry[UsersTable.level])
                 }
             } catch (e: Exception){
@@ -43,7 +44,8 @@ class UserInformationDAO {
                     it[name] = entry.name
                     it[age] = entry.age
                     it[weight] = entry.weight
-                    it[level] = entry.level
+                    it[distance] = entry.distance
+                    it[level] = entry.level?: 0
                 }
             } catch (e: Exception) {
                 throw DatabaseException("User not exist with id: $id", e)

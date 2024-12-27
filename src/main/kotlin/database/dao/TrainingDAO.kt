@@ -1,8 +1,11 @@
 package database.dao
 
 import database.exception.DatabaseException
-import database.tables.TrainingTable
-import database.tables.UsersTable
+import database.tables.training.TrainingTable
+import database.tables.training.TrainingTypesTable
+import database.tables.training.types.JoggingTable
+import database.tables.training.types.YogaTable
+import database.tables.user.UsersTable
 import domain.training.Training
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -12,11 +15,14 @@ import org.joda.time.DateTime
 import org.joda.time.LocalDate
 
 class TrainingDAO{
-
     init {
+        val trainingNames : ArrayList<String> = arrayListOf("Jogging", "Yoga")
         transaction {
             try {
-                SchemaUtils.create(TrainingTable)
+                SchemaUtils.create(TrainingTable, TrainingTypesTable, JoggingTable, YogaTable)
+                for (name in trainingNames) {
+                    TrainingTypesTable.insertIgnore { it[fullName] = name }
+                }
             } catch (_: Exception) {
                 //TODO Добавить логирование
             }
@@ -27,22 +33,18 @@ class TrainingDAO{
         var training : Training
         transaction {
             try {
-                val userId : Int = TrainingTable.select(UsersTable.id)
-                    .limit(1)
-                    .where {UsersTable.login.eq(login)}
-                    .map { it[UsersTable.id] }
-                    .single().value
-                for (entry in TrainingTable.selectAll().where {
-                    (TrainingTable.loginID.eq(userId)) and (TrainingTable.workoutDate.date()
+                for (entry in TrainingTable.innerJoin(UsersTable).selectAll().where {
+                    (UsersTable.login.eq(login)) and (TrainingTable.workoutDate.date()
                         .eq(LocalDate(date.year, date.monthValue, date.dayOfMonth).toDateTimeAtStartOfDay()))}) {
                     val dateTime = entry[TrainingTable.workoutDate]
-                    when (entry[TrainingTable.workoutType]) {
+                    when (entry[TrainingTypesTable.fullName]) {
                         "Jogging" -> {
+                            val distance = JoggingTable.select(JoggingTable.distance).where {JoggingTable.trainingId eq entry[TrainingTable.id]}
                             training = Training.Jogging(
                                 id = entry[TrainingTable.id].value,
                                 date = java.time.LocalDate.of(dateTime.year, dateTime.monthOfYear, dateTime.dayOfMonth),
                                 duration = java.time.Duration.ofSeconds(entry[TrainingTable.workoutDuration]),
-                                distance = entry[TrainingTable.distance]?.toDouble() ?: 0.0
+                                distance = distance.map {it[JoggingTable.distance]}.single().toDouble()
                             )
                             trainingList.add(training)
                         }
@@ -76,20 +78,38 @@ class TrainingDAO{
     fun add(login: String, training: Training) {
         transaction {
             try {
-                TrainingTable.insert {
+                val trainingId = TrainingTable.insertAndGetId {
                     it[loginID] = select(UsersTable.id)
-                        .limit(1)
-                        .where {UsersTable.login.eq(login)}
+                        .where { UsersTable.login.eq(login)}
                         .map { it[UsersTable.id] }
-                        .single().value
+                        .single()
                     it[workoutDate] = DateTime(training.date)
                     it[workoutDuration] = training.duration.seconds
                     when (training) {
                         is Training.Jogging -> {
-                            it[workoutType] = "Jogging"
-                            it[distance] = training.distance.toBigDecimal()
+                            it[workoutType] = select(TrainingTypesTable.id)
+                                .where {TrainingTypesTable.fullName eq "Jogging"}
+                                .map { it[TrainingTypesTable.id] }
+                                .single()
+
                         }
-                        is Training.Yoga -> it[workoutType] = "Yoga"
+                        is Training.Yoga -> it[workoutType] = select(TrainingTypesTable.id)
+                            .where {TrainingTypesTable.fullName eq "Yoga"}
+                            .map { it[TrainingTypesTable.id] }
+                            .single()
+                    }
+                }
+                when (training) {
+                    is Training.Jogging -> {
+                        JoggingTable.insert {
+                            it[JoggingTable.trainingId] = trainingId.value
+                            it[distance] = training.distance.toInt()
+                        }
+                    }
+                    is Training.Yoga -> {
+                        YogaTable.insert {
+                            it[YogaTable.trainingId] = trainingId.value
+                        }
                     }
                 }
             } catch (e: Exception) {

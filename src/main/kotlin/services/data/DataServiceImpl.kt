@@ -17,7 +17,7 @@ class DataServiceImpl(private val authenticator: AuthenticatorInterface, private
             .setName(info.name)
             .setAge(info.age)
             .setWeight(info.weight)
-            .setTotalDistance(info.level)
+            .setTotalDistance(info.distance)
             .build()
         return UserDataResponse.newBuilder()
             .setSuccess(success)

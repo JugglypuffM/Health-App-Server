@@ -2,7 +2,7 @@ package database.dao
 
 
 import database.exception.DatabaseException
-import database.tables.UsersTable
+import database.tables.user.UsersTable
 import domain.user.Account
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
