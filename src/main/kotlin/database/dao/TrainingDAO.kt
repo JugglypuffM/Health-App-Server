@@ -83,7 +83,12 @@ class TrainingDAO{
                         .where { UsersTable.login.eq(login)}
                         .map { it[UsersTable.id] }
                         .single()
-                    it[workoutDate] = DateTime(training.date)
+                    it[workoutDate] = DateTime(
+                        training.date.year,
+                        training.date.monthValue,
+                        training.date.dayOfMonth,
+                        0, 0
+                    )
                     it[workoutDuration] = training.duration.seconds
                     when (training) {
                         is Training.Jogging -> {
