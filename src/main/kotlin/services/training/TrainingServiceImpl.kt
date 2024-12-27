@@ -10,7 +10,8 @@ import io.grpc.Context
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import services.auth.AuthInterceptor
-import java.time.LocalDate
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Optional
 
 class TrainingServiceImpl(
@@ -61,7 +62,10 @@ class TrainingServiceImpl(
         val login = loginKey.get()
 
         val trainings =
-            databaseManager.getTrainingsOnDate(login, LocalDate.ofEpochDay(date.seconds))
+            databaseManager.getTrainingsOnDate(
+                login,
+                Instant.ofEpochSecond(date.seconds).atZone(ZoneId.systemDefault()).toLocalDate()
+            )
         val protoTrainings = trainings.map { it.toTrainingProto() }
         responseObserver.onNext(
             TrainingProto.TrainingsResponse.newBuilder().addAllTrainings(protoTrainings).build()

@@ -49,4 +49,9 @@ interface DatabaseManager {
      * Метод для получения информации о тренировках, записанной на конкретную дату
      */
     fun getTrainingsOnDate(login: String, date: LocalDate): List<Training>
+
+    /**
+     * Метод для удаления тренировки по её идентификатору
+     */
+    fun deleteTrainingById(id: Long)
 }

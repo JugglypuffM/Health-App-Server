@@ -1,7 +1,7 @@
 package database.manager
 
-import database.dao.DAO
 import database.dao.AccountDAO
+import database.dao.TrainingDAO
 import database.dao.UserInformationDAO
 import domain.training.Training
 import domain.user.Account
@@ -15,11 +15,12 @@ import java.util.Optional
  * Реализация менеджера для выполнения запросов к базе данных через Exposed-ORM
  */
 object DatabaseManagerService: DatabaseManager {
-    private val url = "jdbc:postgresql://localhost:${dotenv()["DB_PORT"]}/${dotenv()["DB_NAME"]}"
+    private val url = dotenv()["PSQL_URL"].toString()
     private val dbUser = dotenv()["PSQL_USER"].toString()
     private val dbPassword = dotenv()["PSQL_PASS"].toString()
-    private val dbTableAccounts : DAO<Account>
-    private val dbTableUsers : DAO<UserInfo>
+    private val accountDAO : AccountDAO
+    private val userInformationDAO : UserInformationDAO
+    private val trainingDAO: TrainingDAO
     init {
         Database.connect(
             url = url,
@@ -27,57 +28,64 @@ object DatabaseManagerService: DatabaseManager {
             user = dbUser,
             password = dbPassword
         )
-        dbTableAccounts = AccountDAO()
-        dbTableUsers = UserInformationDAO()
+        accountDAO = AccountDAO()
+        userInformationDAO = UserInformationDAO()
+        trainingDAO = TrainingDAO()
     }
 
     /**
      * Метод для внесения нового пользователя в базу данных
      */
     override fun addAccount(account: Account) {
-        dbTableAccounts.add(account)
+        accountDAO.add(account)
     }
 
     /**
      * Метод для удаления всех данных о пользователе
      */
     override fun deleteAccount(login: String) {
-        dbTableAccounts.delete(login)
+        accountDAO.delete(login)
     }
 
     /**
      * Метод для обновления учётной записи пользователя
      */
     override fun updateAccount(login: String, account: Account) {
-        dbTableAccounts.update(login, account)
+        accountDAO.update(login, account)
     }
 
     /**
      * Метод для получения учётной записи пользователя
      */
     override fun getAccount(login: String) : Optional<Account> {
-        return dbTableAccounts.get(login)
+        return accountDAO.get(login)
     }
 
     /**
      * Метод для обновления информации о пользователе
      */
     override fun updateUserInformation(login: String, userInfo: UserInfo) {
-        dbTableUsers.update(login, userInfo)
+        userInformationDAO.update(login, userInfo)
     }
 
     /**
      * Метод для получения дополнительной информации об аккаунте пользователя
      */
     override fun getUserInformation(login: String) : Optional<UserInfo> {
-        return dbTableUsers.get(login)
+        return userInformationDAO.get(login)
     }
 
     override fun saveTraining(login: String, training: Training) {
-        TODO("Not yet implemented")
+        trainingDAO.add(login, training)
     }
 
     override fun getTrainingsOnDate(login: String, date: LocalDate): List<Training> {
-        TODO("Not yet implemented")
+        return trainingDAO.get(login, date)
     }
+
+    override fun deleteTrainingById(id: Long) {
+        trainingDAO.delete(id)
+    }
+
+
 }

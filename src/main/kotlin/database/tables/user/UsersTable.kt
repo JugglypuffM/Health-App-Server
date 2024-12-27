@@ -1,4 +1,4 @@
-package database.tables
+package database.tables.user
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
@@ -10,4 +10,5 @@ object UsersTable : IntIdTable() {
     val age : Column<Int> = integer("age").default(0)
     val weight : Column<Int> = integer("weight").default(0)
     val distance : Column<Int> = integer("distance").default(0)
+    val level : Column<Int> = integer("level").default(1)
 }

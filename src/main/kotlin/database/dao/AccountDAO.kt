@@ -1,7 +1,8 @@
 package database.dao
 
 
-import database.tables.UsersTable
+import database.exception.DatabaseException
+import database.tables.user.UsersTable
 import domain.user.Account
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -9,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 
-class AccountDAO : DAO<Account> {
+class AccountDAO {
 
     init {
         transaction {
@@ -21,53 +22,54 @@ class AccountDAO : DAO<Account> {
         }
     }
 
-    override fun get(login: String): Optional<Account> {
-        lateinit var account: Account
+    fun get(login: String): Optional<Account> {
+        var account: Account? = null
         transaction {
             try {
                 for (entry in UsersTable.selectAll().where { UsersTable.login.eq(login) }) {
                     account = Account(entry[UsersTable.login], entry[UsersTable.password])
                 }
             } catch (e: Exception){
-                throw DAO.DatabaseException("Error fetching account with login: $login", e)
+                throw DatabaseException("Error fetching account with login: $login", e)
             }
         }
         return Optional.ofNullable(account)
     }
 
-    override fun delete(login: String) {
+    fun delete(login: String) {
         transaction {
             try {
                 UsersTable.deleteWhere { UsersTable.login.eq(login) }
             } catch (e: Exception) {
-                throw DAO.DatabaseException("Account not exist with login: $login", e)
+                throw DatabaseException("Account not exist with login: $login", e)
             }
         }
     }
 
-    override fun update(login: String, entry: Account) {
+    fun update(login: String, account: Account) {
         transaction {
             try {
                 UsersTable.update({ UsersTable.login.eq(login)}) {
-                    it[UsersTable.login] = entry.login
-                    it[password] = entry.password
+                    it[UsersTable.login] = account.login
+                    it[password] = account.password
                 }
             } catch (e: Exception) {
-                throw DAO.DatabaseException("User not exist with login: $login", e)
+                throw DatabaseException("User not exist with login: $login", e)
             }
         }
     }
 
-    override fun add(entry: Account) {
+    fun add(account: Account) {
         transaction {
             try {
                 UsersTable.insert {
-                    it[login] = entry.login
-                    it[password] = entry.password
+                    it[login] = account.login
+                    it[password] = account.password
                 }
             } catch (e: Exception) {
-                throw DAO.DatabaseException("Error adding account: $entry", e)
+                throw DatabaseException("Error adding account: $account", e)
             }
         }
     }
+
 }

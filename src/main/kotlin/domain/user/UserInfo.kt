@@ -10,6 +10,7 @@ data class UserInfo(
     val age: Int? = null,
     val weight: Int? = null,
     val distance: Int? = null,
+    val level: Int? = null,
 ) {
     constructor(userData: UserData) : this(
         if (userData.name.isEmpty()) null else userData.name,
