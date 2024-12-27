@@ -3,27 +3,23 @@ package services.auth
 import database.exception.DatabaseException
 import database.manager.DatabaseManager
 import domain.user.Account
-import domain.auth.AuthResult
 import domain.auth.ResultCode
 
 class Authenticator(private val databaseManager: DatabaseManager): AuthenticatorInterface {
 
-    override fun register(account: Account): AuthResult {
+    override fun register(account: Account): ResultCode {
         try {
             databaseManager.addAccount(account)
-            return AuthResult(ResultCode.OPERATION_SUCCESS, "User successfully registered.")
+            return ResultCode.OPERATION_SUCCESS
         }catch (_: DatabaseException) {
-            return AuthResult(ResultCode.USER_ALREADY_EXISTS, "User already exists.")
+            return ResultCode.USER_ALREADY_EXISTS
         }
     }
 
-    override fun login(login: String, password: String): AuthResult =
-        databaseManager.getAccount(login).map<AuthResult> {
+    override fun login(login: String, password: String): ResultCode =
+        databaseManager.getAccount(login).map<ResultCode> {
             if (it.password == password) {
-                AuthResult(ResultCode.OPERATION_SUCCESS, "User successfully logged in.")
-            } else null
-        }.orElse(
-            AuthResult(ResultCode.INVALID_CREDENTIALS, "Wrong login or password.")
-        )
-
+                ResultCode.OPERATION_SUCCESS
+            } else ResultCode.INVALID_CREDENTIALS
+        }.orElse(ResultCode.INVALID_CREDENTIALS)
 }

@@ -23,14 +23,14 @@ class AccountDAO {
     }
 
     fun get(login: String): Optional<Account> {
-        var account: Account? = null
+        lateinit var account: Account
         transaction {
             try {
                 for (entry in UsersTable.selectAll().where { UsersTable.login.eq(login) }) {
                     account = Account(entry[UsersTable.login], entry[UsersTable.password])
                 }
             } catch (e: Exception){
-                throw DatabaseException("Error fetching user with id: $id", e)
+                throw DatabaseException("Error fetching account with login: $login", e)
             }
         }
         return Optional.ofNullable(account)
@@ -41,7 +41,7 @@ class AccountDAO {
             try {
                 UsersTable.deleteWhere { UsersTable.login.eq(login) }
             } catch (e: Exception) {
-                throw DatabaseException("User not exist with id: $id", e)
+                throw DatabaseException("Account not exist with login: $login", e)
             }
         }
     }
@@ -54,7 +54,7 @@ class AccountDAO {
                     it[password] = account.password
                 }
             } catch (e: Exception) {
-                throw DatabaseException("User not exist with id: $id", e)
+                throw DatabaseException("User not exist with login: $login", e)
             }
         }
     }
@@ -67,7 +67,7 @@ class AccountDAO {
                     it[password] = account.password
                 }
             } catch (e: Exception) {
-                throw DatabaseException("Error adding user with id: $id", e)
+                throw DatabaseException("Error adding account: $entry", e)
             }
         }
     }

@@ -3,8 +3,10 @@ package database.dao
 import database.exception.DatabaseException
 import database.tables.user.UsersTable
 import domain.user.UserInfo
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.util.*
 
 class UserInformationDAO {
@@ -40,17 +42,26 @@ class UserInformationDAO {
     fun update(login: String, entry: UserInfo) {
         transaction {
             try {
-                UsersTable.update({ UsersTable.login.eq(login)}) {
-                    it[name] = entry.name
-                    it[age] = entry.age
-                    it[weight] = entry.weight
-                    it[distance] = entry.distance
-                    it[level] = entry.level?: 0
+                UsersTable.update({ UsersTable.login.eq(login) }) {
+                    if (entry.name is String && entry.name.isNotBlank()) {
+                        it[name] = entry.name
+                    }
+                    if (entry.age is Int && entry.age > 0) {
+                        it[age] = entry.age
+                    }
+                    if (entry.weight is Int && entry.weight > 0) {
+                        it[weight] = entry.weight
+                    }
+                    if (entry.distance is Int && entry.distance > 0) {
+                        it[distance] = entry.distance
+                    }
+                    if (entry.level is Int && entry.level > 0){
+                        it[level] = entry.level
+                    }
                 }
             } catch (e: Exception) {
-                throw DatabaseException("User not exist with id: $id", e)
+                throw DatabaseException("Information not exist for user with login: $login", e)
             }
         }
     }
-
 }

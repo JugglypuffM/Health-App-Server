@@ -1,47 +1,44 @@
 package services.data
 
+import com.google.protobuf.Empty
 import database.manager.DatabaseManager
-import domain.auth.ResultCode
 import domain.user.UserInfo
 import grpc.DataProto
-import grpc.DataProto.UserDataRequest
-import grpc.DataProto.UserDataResponse
 import grpc.DataServiceGrpc
+import io.grpc.Context
+import io.grpc.Status
 import io.grpc.stub.StreamObserver
-import services.auth.AuthenticatorInterface
+import services.auth.AuthInterceptor
 
-class DataServiceImpl(private val authenticator: AuthenticatorInterface, private val databaseManager: DatabaseManager) :
+class DataServiceImpl(
+    private val databaseManager: DatabaseManager,
+    private val loginKey: Context.Key<String> = AuthInterceptor.LOGIN_CONTEXT_KEY
+) :
     DataServiceGrpc.DataServiceImplBase() {
-    private fun createBasicDataResponse(success: Boolean, info: UserInfo): UserDataResponse {
-        val data = DataProto.UserData.newBuilder()
-            .setName(info.name)
-            .setAge(info.age)
-            .setWeight(info.weight)
-            .setTotalDistance(info.distance)
-            .build()
-        return UserDataResponse.newBuilder()
-            .setSuccess(success)
-            .setData(data)
-            .build()
-    }
 
     override fun getUserData(
-        request: UserDataRequest,
-        responseObserver: StreamObserver<UserDataResponse>
+        request: Empty,
+        responseObserver: StreamObserver<DataProto.UserData>
     ) {
-        when (authenticator.login(request.login, request.password).resultCode) {
-            ResultCode.OPERATION_SUCCESS -> {
-                val userInfo = databaseManager.getUserInformation(request.login)
-                responseObserver.onNext(
-                    createBasicDataResponse(
-                        userInfo.isPresent,
-                        userInfo.orElse(UserInfo("", 0, 0, 0))
-                    )
+        val login = loginKey.get()
+
+        val userInfo = databaseManager.getUserInformation(login)
+        userInfo.ifPresentOrElse(
+            { responseObserver.onNext(it.toUserData()) },
+            {
+                responseObserver.onError(
+                    Status.UNKNOWN.withDescription("User not found, thou it should have been").asRuntimeException()
                 )
             }
+        )
+        responseObserver.onCompleted()
+    }
 
-            else -> responseObserver.onNext(createBasicDataResponse(false, UserInfo("", 0, 0, 0)))
-        }
+    override fun updateUserData(request: DataProto.UserData, responseObserver: StreamObserver<Empty>) {
+        val login = loginKey.get()
+
+        databaseManager.updateUserInformation(login, UserInfo(request))
+        responseObserver.onNext(Empty.getDefaultInstance())
         responseObserver.onCompleted()
     }
 }
