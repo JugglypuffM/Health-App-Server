@@ -26,13 +26,16 @@ class AuthInterceptor(private val authenticator: Authenticator) : ServerIntercep
             return next.startCall(call, headers)
         }
 
-        val login = headers.get(Metadata.Key.of("login-bin", Metadata.BINARY_BYTE_MARSHALLER))
-        val password = headers.get(Metadata.Key.of("password-bin", Metadata.BINARY_BYTE_MARSHALLER))
+        val loginBytes = headers.get(Metadata.Key.of("login-bin", Metadata.BINARY_BYTE_MARSHALLER))
+        val passwordBytes = headers.get(Metadata.Key.of("password-bin", Metadata.BINARY_BYTE_MARSHALLER))
 
-        if (login == null || password == null) {
+        if (loginBytes == null || passwordBytes == null) {
             call.close(Status.INVALID_ARGUMENT.withDescription("Not enough data were passed"), headers)
             return object : ServerCall.Listener<ReqT>() {}
         }
+
+        val login = String(loginBytes, Charsets.UTF_8)
+        val password = String(passwordBytes, Charsets.UTF_8)
 
         val result = authenticator.login(login.toString(), password.toString())
         if (result != ResultCode.OPERATION_SUCCESS) {
