@@ -92,13 +92,13 @@ class TrainingDAO{
                     it[workoutDuration] = training.duration.seconds
                     when (training) {
                         is Training.Jogging -> {
-                            it[workoutType] = select(TrainingTypesTable.id)
+                            it[workoutType] = TrainingTypesTable.select(TrainingTypesTable.id)
                                 .where {TrainingTypesTable.fullName eq "Jogging"}
                                 .map { it[TrainingTypesTable.id] }
                                 .single()
 
                         }
-                        is Training.Yoga -> it[workoutType] = select(TrainingTypesTable.id)
+                        is Training.Yoga -> it[workoutType] = TrainingTypesTable.select(TrainingTypesTable.id)
                             .where {TrainingTypesTable.fullName eq "Yoga"}
                             .map { it[TrainingTypesTable.id] }
                             .single()
