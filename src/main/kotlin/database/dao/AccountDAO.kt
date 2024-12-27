@@ -23,7 +23,7 @@ class AccountDAO {
     }
 
     fun get(login: String): Optional<Account> {
-        lateinit var account: Account
+        var account: Account? = null
         transaction {
             try {
                 for (entry in UsersTable.selectAll().where { UsersTable.login.eq(login) }) {
