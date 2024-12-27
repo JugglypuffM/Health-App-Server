@@ -1,7 +1,9 @@
 package database.manager
 
-import domain.Account
-import domain.UserInfo
+import domain.training.Training
+import domain.user.Account
+import domain.user.UserInfo
+import java.time.LocalDate
 import java.util.Optional
 
 /**
@@ -37,4 +39,14 @@ interface DatabaseManager {
      * Метод для получения дополнительной информации об аккаунте пользователя
      */
     fun getUserInformation(login: String) : Optional<UserInfo>
+
+    /**
+     * Метод для сохранения данных о тренировке в базу данных
+     */
+    fun saveTraining(login: String, training: Training)
+
+    /**
+     * Метод для получения информации о тренировках, записанной на конкретную дату
+     */
+    fun getTrainingsOnDate(login: String, date: LocalDate): List<Training>
 }

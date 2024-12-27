@@ -1,9 +1,9 @@
-package auth
+package services.auth
 
 import database.dao.DAO.DatabaseException
 import database.manager.DatabaseManager
-import domain.Account
-import domain.ResultCode
+import domain.user.Account
+import domain.auth.ResultCode
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*
@@ -30,8 +30,7 @@ class AuthenticatorTest {
 
         val result = authenticator.register(account)
 
-        assertEquals(ResultCode.OPERATION_SUCCESS, result.resultCode)
-        assertEquals("User successfully registered.", result.message)
+        assertEquals(ResultCode.OPERATION_SUCCESS, result)
     }
 
     @Test
@@ -42,8 +41,7 @@ class AuthenticatorTest {
 
         val result = authenticator.register(account)
 
-        assertEquals(ResultCode.USER_ALREADY_EXISTS, result.resultCode)
-        assertEquals("User already exists.", result.message)
+        assertEquals(ResultCode.USER_ALREADY_EXISTS, result)
     }
 
     @Test
@@ -54,8 +52,7 @@ class AuthenticatorTest {
 
         val result = authenticator.login("johndoe", "password123")
 
-        assertEquals(ResultCode.OPERATION_SUCCESS, result.resultCode)
-        assertEquals("User successfully logged in.", result.message)
+        assertEquals(ResultCode.OPERATION_SUCCESS, result)
     }
 
     @Test
@@ -66,8 +63,7 @@ class AuthenticatorTest {
 
         val result = authenticator.login("johndoe", "wrongpassword")
 
-        assertEquals(ResultCode.INVALID_CREDENTIALS, result.resultCode)
-        assertEquals("Wrong login or password.", result.message)
+        assertEquals(ResultCode.INVALID_CREDENTIALS, result)
     }
 
     @Test
@@ -78,7 +74,6 @@ class AuthenticatorTest {
 
         val result = authenticator.login("nonexisting", "somepassword")
 
-        assertEquals(ResultCode.INVALID_CREDENTIALS, result.resultCode)
-        assertEquals("Wrong login or password.", result.message)
+        assertEquals(ResultCode.INVALID_CREDENTIALS, result)
     }
 }

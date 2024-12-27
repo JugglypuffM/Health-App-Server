@@ -1,4 +1,4 @@
-package domain
+package domain.user
 
 import grpc.DataProto.UserData
 
@@ -12,10 +12,9 @@ data class UserInfo(
     val distance: Int? = null,
 ) {
     constructor(userData: UserData) : this(
-        userData.name,
-        userData.age,
-        userData.weight,
-        userData.totalDistance
+        if (userData.name.isEmpty()) null else userData.name,
+        if (userData.age <= 0) null else userData.age,
+        if (userData.weight <= 0) null else userData.weight
     )
 
     fun toUserData() = UserData.newBuilder()

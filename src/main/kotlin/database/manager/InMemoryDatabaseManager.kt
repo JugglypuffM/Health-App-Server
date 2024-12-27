@@ -1,8 +1,10 @@
 package database.manager
 
 import database.dao.DAO
-import domain.Account
-import domain.UserInfo
+import domain.training.Training
+import domain.user.Account
+import domain.user.UserInfo
+import java.time.LocalDate
 import java.util.*
 
 object InMemoryDatabaseManager : DatabaseManager {
@@ -47,6 +49,17 @@ object InMemoryDatabaseManager : DatabaseManager {
 
     override fun getUserInformation(login: String): Optional<UserInfo> {
         return Optional.ofNullable(userInformation[login])
+    }
+
+    override fun saveTraining(login: String, training: Training) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getTrainingsOnDate(
+        login: String,
+        date: LocalDate
+    ): List<Training> {
+        TODO("Not yet implemented")
     }
 
     fun dropDataBase() {

@@ -1,4 +1,4 @@
-package domain
+package domain.user
 
 /**
  * Люгин и пароль пользователя
@@ -13,6 +13,6 @@ data class Account(
     }
 
     override fun toString(): String {
-        return "domain.Account(login='$login', password='$password')"
+        return "domain.user.Account(login='$login', password='$password')"
     }
 }

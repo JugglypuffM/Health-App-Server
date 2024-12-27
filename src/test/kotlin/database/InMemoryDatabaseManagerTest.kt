@@ -1,7 +1,7 @@
 import database.dao.DAO
 import database.manager.InMemoryDatabaseManager
-import domain.Account
-import domain.UserInfo
+import domain.user.Account
+import domain.user.UserInfo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

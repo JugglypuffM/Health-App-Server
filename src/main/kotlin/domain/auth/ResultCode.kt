@@ -1,4 +1,4 @@
-package domain
+package domain.auth
 
 enum class ResultCode(val code: Int) {
     OPERATION_SUCCESS(0),

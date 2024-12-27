@@ -3,10 +3,12 @@ package database.manager
 import database.dao.DAO
 import database.dao.AccountDAO
 import database.dao.UserInformationDAO
-import domain.Account
-import domain.UserInfo
+import domain.training.Training
+import domain.user.Account
+import domain.user.UserInfo
 import io.github.cdimascio.dotenv.dotenv
 import org.jetbrains.exposed.sql.Database
+import java.time.LocalDate
 import java.util.Optional
 
 /**
@@ -69,5 +71,13 @@ object DatabaseManagerService: DatabaseManager {
      */
     override fun getUserInformation(login: String) : Optional<UserInfo> {
         return dbTableUsers.get(login)
+    }
+
+    override fun saveTraining(login: String, training: Training) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getTrainingsOnDate(login: String, date: LocalDate): List<Training> {
+        TODO("Not yet implemented")
     }
 }
