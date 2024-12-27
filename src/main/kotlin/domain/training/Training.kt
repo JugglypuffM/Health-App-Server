@@ -3,7 +3,9 @@ package domain.training
 import com.google.protobuf.Timestamp
 import grpc.TrainingProto
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 
 /**
  * Информация о тренировке
@@ -23,7 +25,7 @@ sealed class Training(
         id = id
     ) {
         constructor(yoga: TrainingProto.Yoga) : this(
-            LocalDate.ofEpochDay(yoga.date.seconds),
+            Instant.ofEpochSecond(yoga.date.seconds).atZone(ZoneId.systemDefault()).toLocalDate(),
             Duration.ofSeconds(yoga.duration.seconds)
         )
 
@@ -53,7 +55,7 @@ sealed class Training(
         id = id
     ) {
         constructor(jogging: TrainingProto.Jogging) : this(
-            LocalDate.ofEpochDay(jogging.date.seconds),
+            Instant.ofEpochSecond(jogging.date.seconds).atZone(ZoneId.systemDefault()).toLocalDate(),
             Duration.ofSeconds(jogging.duration.seconds),
             jogging.distance
         )
