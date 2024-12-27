@@ -37,7 +37,7 @@ class TrainingServiceImpl(
                 when (it) {
                     is Training.Jogging -> databaseManager.updateUserInformation(
                         login,
-                        info.copy(distance = info.distance + it.distance)
+                        info.copy(distance = (info.distance ?:0) + it.distance)
                     )
 
                     is Training.Yoga -> {}
