@@ -1,6 +1,6 @@
 package database.manager
 
-import database.dao.DAO
+import database.exception.DatabaseException
 import domain.training.Training
 import domain.user.Account
 import domain.user.UserInfo
@@ -15,7 +15,7 @@ object InMemoryDatabaseManager : DatabaseManager {
             accounts[account.login] = account
             userInformation[account.login] = UserInfo()
         } else {
-            throw DAO.DatabaseException("Account already exist")
+            throw DatabaseException("Account already exist")
         }
     }
 
@@ -23,7 +23,7 @@ object InMemoryDatabaseManager : DatabaseManager {
         if (accounts.containsKey(login)) {
             accounts.remove(login)
         } else {
-            throw DAO.DatabaseException("Account not exist")
+            throw DatabaseException("Account not exist")
         }
     }
 
@@ -31,7 +31,7 @@ object InMemoryDatabaseManager : DatabaseManager {
         if (accounts.containsKey(login)) {
             accounts[login] = account
         } else {
-            throw DAO.DatabaseException("Account not exist")
+            throw DatabaseException("Account not exist")
         }
     }
 
@@ -43,7 +43,7 @@ object InMemoryDatabaseManager : DatabaseManager {
         if (accounts.containsKey(login)) {
             userInformation[login] = userInfo
         } else {
-            throw DAO.DatabaseException("User not exist")
+            throw DatabaseException("User not exist")
         }
     }
 
@@ -59,6 +59,10 @@ object InMemoryDatabaseManager : DatabaseManager {
         login: String,
         date: LocalDate
     ): List<Training> {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteTrainingById(id: Long) {
         TODO("Not yet implemented")
     }
 

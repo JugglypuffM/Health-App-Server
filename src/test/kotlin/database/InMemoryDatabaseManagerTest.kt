@@ -1,4 +1,6 @@
-import database.dao.DAO
+package database
+
+import database.exception.DatabaseException
 import database.manager.InMemoryDatabaseManager
 import domain.user.Account
 import domain.user.UserInfo
@@ -33,7 +35,7 @@ class InMemoryDatabaseManagerTest {
         val account = Account(login = "user1", password = "password")
         databaseManager.addAccount(account)
 
-        val exception = assertThrows<DAO.DatabaseException> {
+        val exception = assertThrows<DatabaseException> {
             databaseManager.addAccount(account)
         }
         assertEquals("Account already exist", exception.message)
@@ -53,7 +55,7 @@ class InMemoryDatabaseManagerTest {
     @Test
     fun testDeleteAccountThrowsExceptionWhenAccountDoesNotExist() {
         databaseManager.dropDataBase()
-        val exception = assertThrows<DAO.DatabaseException> {
+        val exception = assertThrows<DatabaseException> {
             databaseManager.deleteAccount("nonexistent")
         }
         assertEquals("Account not exist", exception.message)
@@ -78,7 +80,7 @@ class InMemoryDatabaseManagerTest {
         databaseManager.dropDataBase()
         val updatedAccount = Account(login = "user1", password = "newpassword")
 
-        val exception = assertThrows<DAO.DatabaseException> {
+        val exception = assertThrows<DatabaseException> {
             databaseManager.updateAccount("nonexistent", updatedAccount)
         }
         assertEquals("Account not exist", exception.message)
@@ -103,7 +105,7 @@ class InMemoryDatabaseManagerTest {
         databaseManager.dropDataBase()
         val userInfo = UserInfo(name = "John Doe", age = 19, weight = 59, distance = 0)
 
-        val exception = assertThrows<DAO.DatabaseException> {
+        val exception = assertThrows<DatabaseException> {
             databaseManager.updateUserInformation("nonexistent", userInfo)
         }
         assertEquals("User not exist", exception.message)

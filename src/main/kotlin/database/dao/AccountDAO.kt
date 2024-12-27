@@ -67,7 +67,7 @@ class AccountDAO {
                     it[password] = account.password
                 }
             } catch (e: Exception) {
-                throw DatabaseException("Error adding account: $entry", e)
+                throw DatabaseException("Error adding account: $account", e)
             }
         }
     }

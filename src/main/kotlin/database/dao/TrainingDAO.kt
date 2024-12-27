@@ -44,7 +44,7 @@ class TrainingDAO{
                                 id = entry[TrainingTable.id].value,
                                 date = java.time.LocalDate.of(dateTime.year, dateTime.monthOfYear, dateTime.dayOfMonth),
                                 duration = java.time.Duration.ofSeconds(entry[TrainingTable.workoutDuration]),
-                                distance = distance.map {it[JoggingTable.distance]}.single().toDouble()
+                                distance = distance.map {it[JoggingTable.distance]}.single()
                             )
                             trainingList.add(training)
                         }
