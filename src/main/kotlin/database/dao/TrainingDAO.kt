@@ -33,7 +33,7 @@ class TrainingDAO{
         var training : Training
         transaction {
             try {
-                for (entry in TrainingTable.innerJoin(UsersTable).selectAll().where {
+                for (entry in TrainingTable.innerJoin(UsersTable).innerJoin(TrainingTypesTable).selectAll().where {
                     (UsersTable.login.eq(login)) and (TrainingTable.workoutDate.date()
                         .eq(LocalDate(date.year, date.monthValue, date.dayOfMonth).toDateTimeAtStartOfDay()))}) {
                     val dateTime = entry[TrainingTable.workoutDate]
