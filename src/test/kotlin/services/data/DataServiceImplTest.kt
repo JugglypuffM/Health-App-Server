@@ -73,14 +73,12 @@ class DataServiceImplTest {
 
     @Test
     fun `updateUserData should return success`() {
-        val oldUserInfo = UserInfo("oldName", 21, 100, 100)
         val newUserInfo = UserInfo("testName", 20, 80, 100000)
-        val resultUserInfo = UserInfo("testName", 20, 80, 100)
+        val resultUserInfo = UserInfo("testName", 20, 80)
 
         val request = newUserInfo.toUserData()
 
         every { loginKeyMock.get() } returns "testUser"
-        every { databaseManagerMock.getUserInformation("testUser") } returns Optional.of(oldUserInfo)
         every { databaseManagerMock.updateUserInformation("testUser", resultUserInfo) } just Runs
 
         dataServiceImpl.updateUserData(request, emptyObserver)
