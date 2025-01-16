@@ -134,7 +134,7 @@ class TrainingDAO{
 
                     is Training.Plank -> {
                         PlankTable.insert {
-                            it[YogaTable.trainingId] = trainingId.value
+                            it[PlankTable.trainingId] = trainingId.value
                         }
                     }
                 }
