@@ -2,16 +2,20 @@ package database
 
 import database.exception.DatabaseException
 import database.manager.InMemoryDatabaseManager
+import domain.training.Training
 import domain.user.Account
 import domain.user.UserInfo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.Duration
+import java.time.LocalDate
 
 class InMemoryDatabaseManagerTest {
 
     private lateinit var databaseManager: InMemoryDatabaseManager
+
 
     @BeforeEach
     fun setUp() {
@@ -125,5 +129,69 @@ class InMemoryDatabaseManagerTest {
         val retrievedUserInfo = databaseManager.getUserInformation("lox")
         assertTrue(retrievedUserInfo.isPresent)
         assertEquals(UserInfo(name = null, age = null, weight = null, distance = null), retrievedUserInfo.get())
+    }
+
+    @Test
+    fun testAddingAndGettingTrainingIfAccountExist() {
+        databaseManager.dropDataBase()
+        databaseManager.addAccount(Account("lox", "12345678"))
+        val expectedTrainings = listOf(
+            Training.Jogging(LocalDate.of(2024, 12, 31), Duration.ofSeconds(100), 1000, id=1),
+            Training.Yoga(LocalDate.of(2024, 12, 31), Duration.ofSeconds(200), id=2)
+        )
+        for (training in expectedTrainings) {
+            databaseManager.saveTraining("lox", training)
+        }
+        databaseManager.saveTraining("lox", Training.Jogging(LocalDate.of(2024, 11, 13), Duration.ofSeconds(300), 3000, id=3))
+
+        val savedTrainings = databaseManager.getTrainingsOnDate("lox", LocalDate.of(2024, 12, 31))
+
+        assertTrue(savedTrainings.isNotEmpty())
+        assertEquals(2, savedTrainings.size)
+        for (expected in expectedTrainings) {
+            assertTrue(savedTrainings.contains(expected))
+        }
+    }
+
+    @Test
+    fun testAddingTrainingIfAccountNotExist() {
+        databaseManager.dropDataBase()
+
+        assertThrows<DatabaseException> {
+            databaseManager.saveTraining("lox", Training.Yoga(LocalDate.of(2024, 11, 13), Duration.ofSeconds(300), id=1))
+        }
+    }
+
+    @Test
+    fun testGettingTrainingsOnDateIfAccountNotExist() {
+        databaseManager.dropDataBase()
+
+        assertThrows<DatabaseException> {
+            databaseManager.getTrainingsOnDate("lox", LocalDate.of(2024, 12, 31))
+        }
+    }
+
+    @Test
+    fun testDeletingTrainingByIdIfExists() {
+        databaseManager.dropDataBase()
+        databaseManager.addAccount(Account("lox", "12345678"))
+
+        val training = Training.Jogging(LocalDate.of(2024, 12, 31), Duration.ofSeconds(100), 1000, id=1)
+        databaseManager.saveTraining("lox", training)
+
+        databaseManager.deleteTrainingById(1)
+
+        val savedTrainings = databaseManager.getTrainingsOnDate("lox", LocalDate.of(2024, 12, 31))
+        assertTrue(savedTrainings.isEmpty())
+    }
+
+    @Test
+    fun testDeletingTrainingByIdIfNotExists() {
+        databaseManager.dropDataBase()
+        databaseManager.addAccount(Account("lox", "12345678"))
+
+        assertThrows<DatabaseException> {
+            databaseManager.deleteTrainingById(9999)
+        }
     }
 }
