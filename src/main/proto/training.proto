@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+option java_package = "grpc";
+option java_outer_classname = "TrainingProto";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service TrainingService{
+  rpc saveTraining (Training) returns (google.protobuf.Empty);
+  rpc getTrainings(google.protobuf.Timestamp) returns (TrainingsResponse);
+}
+
+message Training {
+  oneof training_type {
+    Yoga yoga = 1;
+    Jogging jogging = 2;
+    Plank plank = 3;
+  }
+}
+
+message Yoga {
+  google.protobuf.Timestamp date = 1;
+  google.protobuf.Duration duration = 2;
+}
+
+message Jogging {
+  google.protobuf.Timestamp date = 1;
+  google.protobuf.Duration duration = 2;
+  int32 distance = 3;
+}
+
+message Plank {
+  google.protobuf.Timestamp date = 1;
+  google.protobuf.Duration duration = 2;
+}
+
+message TrainingsResponse{
+  repeated Training trainings = 1;
+}
