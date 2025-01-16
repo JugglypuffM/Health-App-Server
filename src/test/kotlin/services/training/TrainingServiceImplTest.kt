@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneOffset
 
 class TrainingServiceImplTest {
 
@@ -59,7 +61,9 @@ class TrainingServiceImplTest {
     @Test
     fun `getTrainings - should return trainings successfully`() {
         val date = LocalDate.of(2024, 12, 6)
-        val grpcDate = com.google.protobuf.Timestamp.newBuilder().setSeconds(date.toEpochDay()).build()
+        val grpcDate = com.google.protobuf.Timestamp.newBuilder()
+            .setSeconds(date.toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC))
+            .build()
 
         val trainings = listOf(Training.Yoga(date, Duration.ofSeconds(1000)), Training.Jogging(date, Duration.ofSeconds(1000), 1))
 
