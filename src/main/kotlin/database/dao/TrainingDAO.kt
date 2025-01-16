@@ -20,7 +20,7 @@ class TrainingDAO{
         val trainingNames : ArrayList<String> = arrayListOf("Jogging", "Yoga", "Plank")
         transaction {
             try {
-                SchemaUtils.create(TrainingTable, TrainingTypesTable, JoggingTable, YogaTable)
+                SchemaUtils.create(TrainingTable, TrainingTypesTable, JoggingTable, YogaTable, PlankTable)
                 for (name in trainingNames) {
                     TrainingTypesTable.insertIgnore { it[fullName] = name }
                 }
