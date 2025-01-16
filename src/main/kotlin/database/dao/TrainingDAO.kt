@@ -4,6 +4,7 @@ import database.exception.DatabaseException
 import database.tables.training.TrainingTable
 import database.tables.training.TrainingTypesTable
 import database.tables.training.types.JoggingTable
+import database.tables.training.types.PlankTable
 import database.tables.training.types.YogaTable
 import database.tables.user.UsersTable
 import domain.training.Training
@@ -16,7 +17,7 @@ import org.joda.time.LocalDate
 
 class TrainingDAO{
     init {
-        val trainingNames : ArrayList<String> = arrayListOf("Jogging", "Yoga")
+        val trainingNames : ArrayList<String> = arrayListOf("Jogging", "Yoga", "Plank")
         transaction {
             try {
                 SchemaUtils.create(TrainingTable, TrainingTypesTable, JoggingTable, YogaTable)
@@ -57,7 +58,14 @@ class TrainingDAO{
                             trainingList.add(training)
                         }
 
-                        //TODO: Plank
+                        "Plank" -> {
+                            training = Training.Plank(
+                                id = entry[TrainingTable.id].value,
+                                date = java.time.LocalDate.of(dateTime.year, dateTime.monthOfYear, dateTime.dayOfMonth),
+                                duration = java.time.Duration.ofSeconds(entry[TrainingTable.workoutDuration])
+                            )
+                            trainingList.add(training)
+                        }
                     }
                 }
             } catch (e: Exception){
@@ -105,14 +113,17 @@ class TrainingDAO{
                             .map { it[TrainingTypesTable.id] }
                             .single()
 
-                        is Training.Plank -> TODO()
+                        is Training.Plank -> it[workoutType] = TrainingTypesTable.select(TrainingTypesTable.id)
+                            .where {TrainingTypesTable.fullName eq "Plank"}
+                            .map { it[TrainingTypesTable.id] }
+                            .single()
                     }
                 }
                 when (training) {
                     is Training.Jogging -> {
                         JoggingTable.insert {
                             it[JoggingTable.trainingId] = trainingId.value
-                            it[distance] = training.distance.toInt()
+                            it[distance] = training.distance
                         }
                     }
                     is Training.Yoga -> {
@@ -121,7 +132,11 @@ class TrainingDAO{
                         }
                     }
 
-                    is Training.Plank -> TODO()
+                    is Training.Plank -> {
+                        PlankTable.insert {
+                            it[YogaTable.trainingId] = trainingId.value
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 throw DatabaseException("Error adding training", e)

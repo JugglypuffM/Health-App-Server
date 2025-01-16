@@ -78,9 +78,10 @@ sealed class Training(
         }
     }
 
-    class Plank(date: LocalDate, duration: Duration) : Training(
+    class Plank(date: LocalDate, duration: Duration, id: Long? = null) : Training(
         date=date,
-        duration=duration
+        duration=duration,
+        id=id
     ){
         constructor(plank: TrainingProto.Plank) : this(
             Instant.ofEpochSecond(plank.date.seconds).atZone(ZoneId.systemDefault()).toLocalDate(),
