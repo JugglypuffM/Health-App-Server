@@ -78,5 +78,35 @@ sealed class Training(
         }
     }
 
+    class Plank(date: LocalDate, duration: Duration) : Training(
+        date=date,
+        duration=duration
+    ){
+        constructor(plank: TrainingProto.Plank) : this(
+            Instant.ofEpochSecond(plank.date.seconds).atZone(ZoneId.systemDefault()).toLocalDate(),
+            Duration.ofSeconds(plank.duration.seconds)
+        )
+
+        override fun toTrainingProto(): TrainingProto.Training {
+            return TrainingProto.Training.newBuilder()
+                .setPlank(
+                    TrainingProto.Plank.newBuilder()
+                        .setDate(
+                            Timestamp.newBuilder()
+                                .setSeconds(date.toEpochDay())
+                        )
+                        .setDuration(
+                            com.google.protobuf.Duration.newBuilder()
+                                .setSeconds(duration.seconds)
+                        )
+                        .build()
+                ).build()
+        }
+
+        override fun toString(): String {
+            return "Plank($date, $duration)"
+        }
+    }
+
     abstract fun toTrainingProto(): TrainingProto.Training
 }
