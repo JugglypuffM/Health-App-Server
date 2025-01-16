@@ -56,6 +56,8 @@ class TrainingDAO{
                                 )
                             trainingList.add(training)
                         }
+
+                        //TODO: Plank
                     }
                 }
             } catch (e: Exception){
@@ -102,6 +104,8 @@ class TrainingDAO{
                             .where {TrainingTypesTable.fullName eq "Yoga"}
                             .map { it[TrainingTypesTable.id] }
                             .single()
+
+                        is Training.Plank -> TODO()
                     }
                 }
                 when (training) {
@@ -116,6 +120,8 @@ class TrainingDAO{
                             it[YogaTable.trainingId] = trainingId.value
                         }
                     }
+
+                    is Training.Plank -> TODO()
                 }
             } catch (e: Exception) {
                 throw DatabaseException("Error adding training", e)

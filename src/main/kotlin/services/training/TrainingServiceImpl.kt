@@ -25,6 +25,8 @@ class TrainingServiceImpl(
 
             trainingData.hasJogging() -> Optional.of(Training.Jogging(trainingData.jogging))
 
+            trainingData.hasPlank() -> Optional.of(Training.Plank(trainingData.plank))
+
             else -> Optional.empty()
         }
 
@@ -42,6 +44,7 @@ class TrainingServiceImpl(
                     )
 
                     is Training.Yoga -> {}
+                    is Training.Plank -> {}
                 }
                 responseObserver.onNext(Empty.getDefaultInstance())
             },

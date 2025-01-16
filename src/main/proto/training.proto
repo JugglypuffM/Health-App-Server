@@ -16,6 +16,7 @@ message Training {
   oneof training_type {
     Yoga yoga = 1;
     Jogging jogging = 2;
+    Plank plank = 3;
   }
 }
 
@@ -28,6 +29,11 @@ message Jogging {
   google.protobuf.Timestamp date = 1;
   google.protobuf.Duration duration = 2;
   int32 distance = 3;
+}
+
+message Plank {
+  google.protobuf.Timestamp date = 1;
+  google.protobuf.Duration duration = 2;
 }
 
 message TrainingsResponse{
