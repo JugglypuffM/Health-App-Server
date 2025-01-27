@@ -47,6 +47,7 @@ class TrainingServiceImpl(
                     is Training.Plank -> {}
                 }
                 responseObserver.onNext(Empty.getDefaultInstance())
+                responseObserver.onCompleted()
             },
             {
                 responseObserver.onError(
@@ -55,7 +56,6 @@ class TrainingServiceImpl(
                 )
             }
         )
-        responseObserver.onCompleted()
     }
 
     override fun getTrainings(
